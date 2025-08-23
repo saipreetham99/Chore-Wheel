@@ -1,0 +1,174 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer base {
+  :root {
+    --background: 60 56% 91%;
+    --foreground: 240 5% 20%;
+    --card: 60 30% 96%;
+    --card-foreground: 240 5% 20%;
+    --popover: 60 30% 96%;
+    --popover-foreground: 240 5% 20%;
+    --primary: 45 100% 52%;
+    --primary-foreground: 45 95% 10%;
+    --secondary: 50 20% 85%;
+    --secondary-foreground: 50 20% 25%;
+    --muted: 50 20% 85%;
+    --muted-foreground: 50 15% 45%;
+    --accent: 217 91% 55%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 60 20% 80%;
+    --input: 60 20% 83%;
+    --ring: 45 100% 52%;
+    --chart-1: 45 100% 52%;
+    --chart-2: 217 91% 55%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --radius: 0.5rem;
+  }
+  .dark {
+    --background: 240 5% 10%;
+    --foreground: 60 30% 96%;
+    --card: 240 5% 15%;
+    --card-foreground: 60 30% 96%;
+    --popover: 240 5% 15%;
+    --popover-foreground: 60 30% 96%;
+    --primary: 45 100% 52%;
+    --primary-foreground: 45 95% 10%;
+    --secondary: 240 5% 25%;
+    --secondary-foreground: 60 30% 96%;
+    --muted: 240 5% 25%;
+    --muted-foreground: 60 20% 75%;
+    --accent: 217 91% 60%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5% 25%;
+    --input: 240 5% 25%;
+    --ring: 45 100% 52%;
+    --chart-1: 45 100% 52%;
+    --chart-2: 217 91% 60%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 0.5cm;
+  }
+
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  
+  .no-print {
+    display: none !important;
+  }
+  
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  
+  /* Force light theme for printing */
+  .dark {
+    --background: 0 0% 100%;
+    --foreground: 240 5% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 5% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 5% 10%;
+    --primary: 45 100% 52%;
+    --primary-foreground: 45 95% 10%;
+    --secondary: 240 5% 95%;
+    --secondary-foreground: 240 5% 10%;
+    --muted: 240 5% 95%;
+    --muted-foreground: 240 5% 45%;
+    --accent: 217 91% 60%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5% 85%;
+    --input: 240 5% 85%;
+    --ring: 45 100% 52%;
+  }
+  
+  body, .card {
+    border: 1px solid #ccc !important;
+    box-shadow: none !important;
+  }
+
+  .printable-area h3 {
+    font-size: 0.7rem;
+    margin-bottom: 0.1rem;
+    margin-top: 0.25rem;
+  }
+  
+  .printable-area .space-y-4 {
+    gap: 0.25rem;
+  }
+
+  .printable-area .space-y-10 {
+    gap: 0.25rem;
+  }
+  
+  .printable-area .grid {
+    gap: 0.25rem;
+  }
+
+  .printable-area .text-sm, .printable-area .text-xs {
+    font-size: 0.55rem;
+    line-height: 1.1;
+  }
+  
+  .printable-area .p-2, .printable-area .p-3, .printable-area .p-6 {
+    padding: 0.2rem;
+  }
+  
+  .printable-area .font-semibold {
+    font-size: 0.6rem;
+  }
+
+  .printable-area .lg\:grid-cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  
+  .printable-area .h-\[120px\] {
+    height: 75px;
+  }
+  
+  .printable-area .space-y-2 {
+    gap: 0.1rem;
+  }
+
+  .printable-area .p-2.space-y-2 {
+    padding: 0.1rem;
+    gap: 0.1rem;
+  }
+
+  .printable-area .flex-shrink-0 {
+    width: 1rem;
+    height: 1rem;
+  }
+}
