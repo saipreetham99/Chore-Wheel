@@ -268,12 +268,22 @@ export default function Home() {
                     <div key={chore.id} className="flex flex-col gap-2 p-3 border rounded-lg">
                        {editingChore === chore.id ? (
                         <div className="space-y-3">
-                            <Input
-                                defaultValue={chore.title}
-                                placeholder="Task Title"
-                                onBlur={(e) => handleUpdateChore(chore.id, 'title', e.target.value)}
-                                className="text-lg font-semibold"
-                            />
+                            <div className="flex justify-between items-start">
+                                <Input
+                                    defaultValue={chore.title}
+                                    placeholder="Task Title"
+                                    onBlur={(e) => handleUpdateChore(chore.id, 'title', e.target.value)}
+                                    className="text-lg font-semibold flex-grow"
+                                />
+                                <div className="flex items-center gap-2 ml-2">
+                                    <Button variant="ghost" size="icon" onClick={() => setEditingChore(null)}>
+                                        <Save className="h-4 w-4" />
+                                    </Button>
+                                    <Button variant="ghost" size="icon" onClick={() => handleRemoveChore(chore.id)}>
+                                        <Trash2 className="h-4 w-4 text-destructive" />
+                                    </Button>
+                                </div>
+                            </div>
                              <Input
                                 defaultValue={chore.description}
                                 placeholder="Task Description"
@@ -292,8 +302,8 @@ export default function Home() {
                             <p className="text-sm text-muted-foreground">{chore.description}</p>
                           </div>
                            <div className="flex items-center gap-2">
-                              <Button variant="ghost" size="icon" onClick={() => setEditingChore(editingChore === chore.id ? null : chore.id)}>
-                                  {editingChore === chore.id ? <Save className="h-4 w-4" /> : <Pencil className="h-4 w-4" />}
+                              <Button variant="ghost" size="icon" onClick={() => setEditingChore(chore.id)}>
+                                <Pencil className="h-4 w-4" />
                               </Button>
                               <Button variant="ghost" size="icon" onClick={() => handleRemoveChore(chore.id)}>
                                   <Trash2 className="h-4 w-4 text-destructive" />
