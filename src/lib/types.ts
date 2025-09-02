@@ -10,6 +10,7 @@ export type Chore = {
   title: string;
   description: string;
   iconName: keyof typeof icons;
+  frequency: number;
 };
 
 export type Task = {
