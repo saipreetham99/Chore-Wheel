@@ -283,8 +283,17 @@ export default function Home() {
                                 placeholder="Lucide Icon Name"
                                 onBlur={(e) => handleUpdateChore(chore.id, 'iconName', e.target.value)}
                             />
-                            <div>
-                                <Label htmlFor={`frequency-${chore.id}`} className="text-sm font-medium">Frequency (per 4 weeks)</Label>
+                        </div>
+                       ) : (
+                        <div>
+                            <p className="font-semibold">{chore.title}</p>
+                            <p className="text-sm text-muted-foreground">{chore.description}</p>
+                        </div>
+                       )}
+
+                        <div className="flex items-center justify-between gap-4">
+                            <div className="flex-grow">
+                                <Label htmlFor={`frequency-${chore.id}`} className="text-xs font-medium text-muted-foreground">Frequency (per 4 weeks)</Label>
                                 <Input
                                     id={`frequency-${chore.id}`}
                                     type="number"
@@ -295,21 +304,14 @@ export default function Home() {
                                     className="mt-1"
                                 />
                             </div>
-                        </div>
-                       ) : (
-                        <div>
-                            <p className="font-semibold">{chore.title} (x{chore.frequency})</p>
-                            <p className="text-sm text-muted-foreground">{chore.description}</p>
-                        </div>
-                       )}
-
-                        <div className="flex items-center justify-end gap-2">
-                            <Button variant="ghost" size="icon" onClick={() => setEditingChore(editingChore === chore.id ? null : chore.id)}>
-                                {editingChore === chore.id ? <Save className="h-4 w-4" /> : <Pencil className="h-4 w-4" />}
-                            </Button>
-                            <Button variant="ghost" size="icon" onClick={() => handleRemoveChore(chore.id)}>
-                                <Trash2 className="h-4 w-4 text-destructive" />
-                            </Button>
+                            <div className="flex items-center gap-2 pt-5">
+                                <Button variant="ghost" size="icon" onClick={() => setEditingChore(editingChore === chore.id ? null : chore.id)}>
+                                    {editingChore === chore.id ? <Save className="h-4 w-4" /> : <Pencil className="h-4 w-4" />}
+                                </Button>
+                                <Button variant="ghost" size="icon" onClick={() => handleRemoveChore(chore.id)}>
+                                    <Trash2 className="h-4 w-4 text-destructive" />
+                                </Button>
+                            </div>
                         </div>
                     </div>
                   ))}
