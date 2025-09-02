@@ -160,7 +160,7 @@ export default function Home() {
       title: 'New Task',
       description: 'Task description',
       iconName: 'ClipboardList',
-      frequency: 1,
+      frequency: 4,
     };
     setChores({ ...chores, [newChoreId]: newChore });
   };
@@ -325,7 +325,7 @@ export default function Home() {
                                 <Button size="icon" variant="outline" onClick={() => handleFrequencyChange(chore.id, -1)}>
                                     <Minus className="h-4 w-4" />
                                 </Button>
-                                <span className="font-bold text-lg w-6 text-center">{chore.frequency}</span>
+                                <span className="font-bold text-lg w-6 text-center">{chore.frequency || 1}</span>
                                 <Button size="icon" variant="outline" onClick={() => handleFrequencyChange(chore.id, 1)}>
                                     <Plus className="h-4 w-4" />
                                 </Button>
@@ -345,3 +345,5 @@ export default function Home() {
     </div>
   );
 }
+
+    
