@@ -70,3 +70,61 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+@media print {
+  body {
+    background-color: #fff;
+    color: #000;
+  }
+  .no-print {
+    display: none;
+  }
+  .print-only {
+    display: block;
+  }
+  main {
+    padding: 0;
+  }
+  .printable-area {
+    padding: 1rem;
+  }
+  .printable-area .grid {
+    grid-template-columns: 1fr;
+  }
+  .printable-area .lg\:col-span-2 {
+    grid-column: span 1 / span 1;
+  }
+  .printable-area .space-y-10 {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+  .printable-area .grid-cols-1 {
+     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .dark {
+    --background: 0 0% 100%;
+    --foreground: 240 5% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 5% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 5% 10%;
+    --primary: 45 100% 52%;
+    --primary-foreground: 45 95% 10%;
+    --secondary: 240 5% 95%;
+    --secondary-foreground: 240 5% 10%;
+    --muted: 240 5% 95%;
+    --muted-foreground: 240 5% 45%;
+    --accent: 217 91% 60%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5% 85%;
+    --input: 240 5% 85%;
+    --ring: 45 100% 52%;
+  }
+  .card {
+    border: 1px solid hsl(var(--border));
+    box-shadow: none;
+  }
+}
