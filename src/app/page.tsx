@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { initialTasks as defaultInitialTasks, chores as defaultChoores, teamMembers as defaultTeamMembers } from '@/lib/initial-data';
-import { FlameKindling, Trash2, PlusCircle, Pencil, Save, ArrowRight, ArrowLeft, Minus, Plus } from 'lucide-react';
+import { FlameKindling, Trash2, PlusCircle, Pencil, Save, ArrowRight, ArrowLeft, Minus, Plus, Printer } from 'lucide-react';
 import { MonthlyCalendarView } from '@/components/monthly-calendar-view';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,8 +19,9 @@ export default function Home() {
   const [isMounted, setIsMounted] = useState(false);
   const [editingMember, setEditingMember] = useState<TeamMemberName | null>(null);
   const [editingChore, setEditingChore] = useState<string | null>(null);
-  const [currentDate, setCurrentDate] = useState(() => new Date());
-  
+  const [startDate] = useState(() => new Date());
+  const [monthOffset, setMonthOffset] = useState(0);
+
   const { toast } = useToast();
 
   useEffect(() => {
@@ -53,7 +54,6 @@ export default function Home() {
   const uniqueChoreIds = useMemo(() => Object.keys(chores), [chores]);
   
   const [history, setHistory] = useState<Record<number, Task[]>>({});
-  const [monthOffset, setMonthOffset] = useState(0);
 
   const initialTasks: Task[] = useMemo(() => {
     if (!teamMembers.length || !uniqueChoreIds.length) return [];
@@ -93,33 +93,18 @@ export default function Home() {
   }, [history, isMounted]);
 
   const handleNextMonth = () => {
-    const nextMonthIndex = monthOffset + 1;
-    if (!history[nextMonthIndex]) {
-        const shuffledChoreIds = shuffle([...uniqueChoreIds]);
-        const nextMonthStartTasks: Task[] = teamMembers.map((member, index) => {
-            const choreId = shuffledChoreIds[index % shuffledChoreIds.length];
-            return {
-                id: `task-${member}-${choreId}-m${nextMonthIndex}`,
-                choreId: choreId,
-                assignee: member,
-            };
-        });
-        setHistory(prev => ({ ...prev, [nextMonthIndex]: nextMonthStartTasks }));
-    }
-    setMonthOffset(nextMonthIndex);
+    setMonthOffset(prev => prev + 1);
   };
 
   const handlePreviousMonth = () => {
-    if (monthOffset > 0) {
-      setMonthOffset(prev => prev - 1);
-    }
+    setMonthOffset(prev => Math.max(0, prev - 1));
   };
   
   const displayDate = useMemo(() => {
-    const d = new Date();
+    const d = new Date(startDate);
     d.setMonth(d.getMonth() + monthOffset);
     return d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-  }, [monthOffset]);
+  }, [monthOffset, startDate]);
   
   const handleAddMember = () => {
     const newMemberName = `Person ${teamMembers.length + 1}` as TeamMemberName;
@@ -200,7 +185,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen bg-background font-body text-foreground">
-      <header className="p-4 sm:p-6 border-b sticky top-0 bg-background/80 backdrop-blur-sm z-10">
+      <header className="p-4 sm:p-6 border-b sticky top-0 bg-background/80 backdrop-blur-sm z-10 no-print">
         <div className="max-w-7xl mx-auto">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-4">
@@ -228,7 +213,7 @@ export default function Home() {
         </div>
       </header>
       <main className="flex-1 p-4 sm:p-6">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8 printable-area">
           <div className="lg:col-span-2">
             <MonthlyCalendarView
               key={`${teamMembers.length}-${Object.keys(chores).length}-${monthOffset}`}
@@ -237,7 +222,7 @@ export default function Home() {
               monthOffset={monthOffset}
             />
           </div>
-          <div className="space-y-6">
+          <div className="space-y-6 no-print">
             <Card>
               <CardHeader>
                 <CardTitle>Team Members</CardTitle>
@@ -283,12 +268,22 @@ export default function Home() {
                     <div key={chore.id} className="flex flex-col gap-2 p-3 border rounded-lg">
                        {editingChore === chore.id ? (
                         <div className="space-y-3">
-                            <Input
-                                defaultValue={chore.title}
-                                placeholder="Task Title"
-                                onBlur={(e) => handleUpdateChore(chore.id, 'title', e.target.value)}
-                                className="text-lg font-semibold"
-                            />
+                            <div className="flex justify-between items-start">
+                                <Input
+                                    defaultValue={chore.title}
+                                    placeholder="Task Title"
+                                    onBlur={(e) => handleUpdateChore(chore.id, 'title', e.target.value)}
+                                    className="text-lg font-semibold flex-grow"
+                                />
+                                <div className="flex items-center gap-2 ml-2">
+                                    <Button variant="ghost" size="icon" onClick={() => setEditingChore(null)}>
+                                        <Save className="h-4 w-4" />
+                                    </Button>
+                                    <Button variant="ghost" size="icon" onClick={() => handleRemoveChore(chore.id)}>
+                                        <Trash2 className="h-4 w-4 text-destructive" />
+                                    </Button>
+                                </div>
+                            </div>
                              <Input
                                 defaultValue={chore.description}
                                 placeholder="Task Description"
@@ -307,8 +302,8 @@ export default function Home() {
                             <p className="text-sm text-muted-foreground">{chore.description}</p>
                           </div>
                            <div className="flex items-center gap-2">
-                              <Button variant="ghost" size="icon" onClick={() => setEditingChore(editingChore === chore.id ? null : chore.id)}>
-                                  {editingChore === chore.id ? <Save className="h-4 w-4" /> : <Pencil className="h-4 w-4" />}
+                              <Button variant="ghost" size="icon" onClick={() => setEditingChore(chore.id)}>
+                                <Pencil className="h-4 w-4" />
                               </Button>
                               <Button variant="ghost" size="icon" onClick={() => handleRemoveChore(chore.id)}>
                                   <Trash2 className="h-4 w-4 text-destructive" />
@@ -340,6 +335,12 @@ export default function Home() {
               </CardContent>
             </Card>
           </div>
+        </div>
+        <div className="max-w-7xl mx-auto mt-8 flex justify-end no-print">
+            <Button onClick={() => window.print()}>
+                <Printer className="mr-2 h-4 w-4" />
+                Print Schedule
+            </Button>
         </div>
       </main>
     </div>

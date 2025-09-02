@@ -70,3 +70,95 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 0.5cm;
+  }
+
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  
+  .no-print {
+    display: none !important;
+  }
+  
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  
+  /* Force light theme for printing */
+  .dark {
+    --background: 0 0% 100%;
+    --foreground: 240 5% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 5% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 5% 10%;
+    --primary: 45 100% 52%;
+    --primary-foreground: 45 95% 10%;
+    --secondary: 240 5% 95%;
+    --secondary-foreground: 240 5% 10%;
+    --muted: 240 5% 95%;
+    --muted-foreground: 240 5% 45%;
+    --accent: 217 91% 60%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5% 85%;
+    --input: 240 5% 85%;
+    --ring: 45 100% 52%;
+  }
+  
+  body, .card {
+    border: 1px solid #ccc !important;
+    box-shadow: none !important;
+  }
+
+  .printable-area h3 {
+    font-size: 0.8rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .printable-area .space-y-10 {
+    gap: 0.5rem;
+  }
+  
+  .printable-area .grid {
+    gap: 0.25rem;
+  }
+
+  .printable-area .text-sm, .printable-area .text-xs {
+    font-size: 0.6rem;
+    line-height: 1.2;
+  }
+  
+  .printable-area .p-2, .printable-area .p-3 {
+    padding: 0.25rem;
+  }
+  
+  .printable-area .font-semibold {
+    font-size: 0.7rem;
+  }
+
+  .printable-area .lg\:grid-cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  
+  .printable-area .h-\[120px\] {
+    height: 100px;
+  }
+  
+  .printable-area .space-y-2 {
+    gap: 0.25rem;
+  }
+  
+  .printable-area .p-2.space-y-2 {
+    padding: 0.25rem;
+    gap: 0.25rem;
+  }
+}
