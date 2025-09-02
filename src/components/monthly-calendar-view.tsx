@@ -34,34 +34,43 @@ export function MonthlyCalendarView({
     }
     
     // 2. Shuffle the pool to randomize initial distribution
-    const shuffledTaskPool = shuffle(taskPool);
+    let shuffledTaskPool = shuffle(taskPool);
+    
+    // Create a seed based on the monthOffset to ensure consistent shuffling for the same month
+    const seed = monthOffset;
+    shuffledTaskPool = shuffle(shuffledTaskPool, seed);
 
-    // 3. Distribute tasks as evenly as possible among team members
-    const assignments: Record<TeamMemberName, string[]> = {};
-    teamMembers.forEach(member => {
-      assignments[member] = [];
-    });
 
-    shuffledTaskPool.forEach((choreId, index) => {
-      const member = teamMembers[index % teamMembers.length];
-      assignments[member].push(choreId);
+    // 3. Distribute tasks as evenly as possible among team members across all weeks
+    const assignments: { member: TeamMemberName, choreId: string, week: number }[] = [];
+    const memberTaskCounts: Record<TeamMemberName, number> = teamMembers.reduce((acc, member) => ({ ...acc, [member]: 0 }), {});
+
+    const totalSlots = teamMembers.length * WEEKS_IN_MONTH;
+    shuffledTaskPool.slice(0, totalSlots).forEach((choreId, index) => {
+        const week = Math.floor(index / teamMembers.length);
+        
+        // Simple rotation for assignment
+        const memberIndex = index % teamMembers.length;
+        const member = teamMembers[memberIndex];
+        
+        assignments.push({
+            member,
+            choreId,
+            week,
+        });
+        memberTaskCounts[member]++;
     });
     
     // 4. Structure the assignments into weekly tasks
     const weeks: Task[][] = Array.from({ length: WEEKS_IN_MONTH }, () => []);
 
-    for (let weekIndex = 0; weekIndex < WEEKS_IN_MONTH; weekIndex++) {
-      teamMembers.forEach(member => {
-        const choreIdForWeek = assignments[member][weekIndex];
-        if (choreIdForWeek) {
-          weeks[weekIndex].push({
-            id: `task-${member}-${choreIdForWeek}-m${monthOffset}-w${weekIndex}`,
-            choreId: choreIdForWeek,
+    assignments.forEach(({member, choreId, week}) => {
+        weeks[week].push({
+            id: `task-${member}-${choreId}-m${monthOffset}-w${week}`,
+            choreId: choreId,
             assignee: member,
-          });
-        }
-      });
-    }
+        });
+    });
 
     return weeks;
   }, [chores, teamMembers, monthOffset]);
@@ -80,7 +89,7 @@ export function MonthlyCalendarView({
                 <h3 className="text-xl font-semibold">Week {weekIndex + 1}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     {teamMembers.map((member) => {
-                        const assignedTask = tasksByAssignee(weekTasks)[member];
+                        const assignedTask = (weekTasks || []).find(t => t.assignee === member);
                         const chore = assignedTask ? chores[assignedTask.choreId] : null;
                         return (
                             <Card key={`${weekIndex}-${member}`}>
