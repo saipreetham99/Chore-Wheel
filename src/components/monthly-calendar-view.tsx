@@ -29,7 +29,6 @@ export function MonthlyCalendarView({
     );
 
     const seed = monthOffset;
-    const shuffledTeamMembers = shuffle([...teamMembers], seed);
 
     for (let week = 0; week < WEEKS_IN_MONTH; week++) {
       // 1. Create a pool of all task instances for the week
@@ -41,11 +40,11 @@ export function MonthlyCalendarView({
         }
       }
       const shuffledTasks = shuffle(weeklyTaskPool, seed + week);
+      const shuffledTeamMembers = shuffle([...teamMembers], seed + week);
 
       // 2. Distribute tasks from the pool to team members
       shuffledTasks.forEach((choreId, taskIndex) => {
-        const memberIndex = taskIndex % shuffledTeamMembers.length;
-        const memberName = shuffledTeamMembers[memberIndex];
+        const memberName = shuffledTeamMembers[taskIndex % shuffledTeamMembers.length];
         const teamMemberOriginalIndex = teamMembers.indexOf(memberName);
         
         if (teamMemberOriginalIndex !== -1) {
