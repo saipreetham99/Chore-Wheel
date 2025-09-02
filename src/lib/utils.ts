@@ -26,22 +26,32 @@ export function rotateChores(tasks: Task[], teamMembers: TeamMemberName[]): Task
   }));
 }
 
-export function shuffle<T>(array: T[]): T[] {
+// Simple seeded PRNG
+function seededRandom(seed: number) {
+  let s = Math.sin(seed) * 10000;
+  return s - Math.floor(s);
+}
+
+export function shuffle<T>(array: T[], seed?: number): T[] {
   let currentIndex = array.length,  randomIndex;
+  const newArray = [...array]; // Create a copy to avoid mutating the original array
+
+  const random = seed !== undefined ? () => seededRandom(seed * (currentIndex+1)) : Math.random;
 
   // While there remain elements to shuffle.
   while (currentIndex > 0) {
     // Pick a remaining element.
-    randomIndex = Math.floor(Math.random() * currentIndex);
+    randomIndex = Math.floor(random() * currentIndex);
     currentIndex--;
 
     // And swap it with the current element.
-    [array[currentIndex], array[randomIndex]] = [
-      array[randomIndex], array[currentIndex]];
+    [newArray[currentIndex], newArray[randomIndex]] = [
+      newArray[randomIndex], newArray[currentIndex]];
   }
 
-  return array;
+  return newArray;
 }
+
 
 export function getNextTuesday() {
   const date = new Date();
@@ -59,8 +69,8 @@ export function getNextTuesday() {
 
 
 export const chores: Record<string, Chore> = {
-  'clean-kitchen': { id: 'clean-kitchen', title: 'Clean Kitchen', description: 'Wipe counters, do dishes, clean sink.', iconName: 'CookingPot' },
-  'clean-living-area': { id: 'clean-living-area', title: 'Clean Living Area', description: 'Tidy up, dust surfaces, vacuum.', iconName: 'Sofa' },
-  'clean-bathroom': { id: 'clean-bathroom', title: 'Clean Bathroom', description: 'Clean toilet, sink, and shower.', iconName: 'Bath' },
-  'take-out-trash': { id: 'take-out-trash', title: 'Take out Trash', description: 'Empty all non-kitchen trash bins and take to curb.', iconName: 'Trash2' },
+  'clean-kitchen': { id: 'clean-kitchen', title: 'Clean Kitchen', description: 'Wipe counters, do dishes, clean sink.', iconName: 'CookingPot', frequency: 1 },
+  'clean-living-area': { id: 'clean-living-area', title: 'Clean Living Area', description: 'Tidy up, dust surfaces, vacuum.', iconName: 'Sofa', frequency: 1 },
+  'clean-bathroom': { id: 'clean-bathroom', title: 'Clean Bathroom', description: 'Clean toilet, sink, and shower.', iconName: 'Bath', frequency: 1 },
+  'take-out-trash': { id: 'take-out-trash', title: 'Take out Trash', description: 'Empty all non-kitchen trash bins and take to curb.', iconName: 'Trash2', frequency: 1 },
 };
