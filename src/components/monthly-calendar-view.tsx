@@ -40,20 +40,20 @@ export function MonthlyCalendarView({
         }
       }
       const shuffledTasks = shuffle(weeklyTaskPool, seed + week);
-      const shuffledTeamMembers = shuffle([...teamMembers], seed + week);
 
-      // 2. Distribute tasks from the pool to team members
+      // 2. Rotate team members each week for fairer distribution of extra tasks
+      const startingMemberIndex = week % teamMembers.length;
+
+      // 3. Distribute tasks from the pool to team members in a round-robin fashion
       shuffledTasks.forEach((choreId, taskIndex) => {
-        const memberName = shuffledTeamMembers[taskIndex % shuffledTeamMembers.length];
-        const teamMemberOriginalIndex = teamMembers.indexOf(memberName);
+        const memberIndex = (startingMemberIndex + taskIndex) % teamMembers.length;
+        const memberName = teamMembers[memberIndex];
         
-        if (teamMemberOriginalIndex !== -1) {
-            schedule[week][teamMemberOriginalIndex].push({
-              id: `task-${memberName}-${choreId}-m${monthOffset}-w${week}-i${taskIndex}`,
-              choreId: choreId,
-              assignee: memberName,
-            });
-        }
+        schedule[week][memberIndex].push({
+            id: `task-${memberName}-${choreId}-m${monthOffset}-w${week}-i${taskIndex}`,
+            choreId: choreId,
+            assignee: memberName,
+        });
       });
     }
 
