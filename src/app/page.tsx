@@ -172,15 +172,20 @@ export default function Home() {
   };
 
   const handleUpdateChore = (choreId: string, field: keyof Chore, value: string | number) => {
+     let updatedValue = value;
+      if (field === 'frequency') {
+        const numValue = Number(value);
+        updatedValue = isNaN(numValue) || numValue < 1 ? 1 : numValue;
+      }
      setChores(prev => ({
       ...prev,
-      [choreId]: { ...prev[choreId], [field]: value }
+      [choreId]: { ...prev[choreId], [field]: updatedValue }
     }));
   };
 
   const handleFrequencyChange = (choreId: string, amount: number) => {
     setChores(prev => {
-        const currentFrequency = prev[choreId].frequency;
+        const currentFrequency = prev[choreId].frequency || 1;
         const newFrequency = Math.max(1, currentFrequency + amount);
         return {
             ...prev,
