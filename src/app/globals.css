@@ -91,13 +91,6 @@ body {
     margin: 0 !important;
   }
   
-  .printable-area {
-    transform: scale(0.8);
-    transform-origin: top left;
-    width: 125%; /* 100 / 0.8 */
-    height: 125%;
-  }
-
   /* Force light theme for printing */
   .dark {
     --background: 0 0% 100%;
@@ -122,40 +115,48 @@ body {
   }
   
   body, .card {
-    border: none !important;
+    border: 1px solid #ccc !important;
     box-shadow: none !important;
   }
 
   .printable-area h3 {
-    font-size: 1rem;
-    margin-bottom: 0.5rem;
+    font-size: 0.8rem;
+    margin-bottom: 0.25rem;
   }
 
   .printable-area .space-y-10 {
-    gap: 1rem;
-  }
-
-  .printable-area .gap-4 {
     gap: 0.5rem;
   }
+  
+  .printable-area .grid {
+    gap: 0.25rem;
+  }
 
-  .printable-area .p-2 {
+  .printable-area .text-sm, .printable-area .text-xs {
+    font-size: 0.6rem;
+    line-height: 1.2;
+  }
+  
+  .printable-area .p-2, .printable-area .p-3 {
     padding: 0.25rem;
   }
   
-  .printable-area .text-sm, .printable-area .text-xs {
-    font-size: 0.75rem;
-    line-height: 1;
-  }
-
   .printable-area .font-semibold {
-    font-size: 0.8rem;
+    font-size: 0.7rem;
   }
 
+  .printable-area .lg\:grid-cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  
   .printable-area .h-\[120px\] {
-    height: auto;
+    height: 100px;
   }
-
+  
+  .printable-area .space-y-2 {
+    gap: 0.25rem;
+  }
+  
   .printable-area .p-2.space-y-2 {
     padding: 0.25rem;
     gap: 0.25rem;
