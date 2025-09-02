@@ -160,7 +160,7 @@ export default function Home() {
       title: 'New Task',
       description: 'Task description',
       iconName: 'ClipboardList',
-      frequency: 4,
+      frequency: 1,
     };
     setChores({ ...chores, [newChoreId]: newChore });
   };
@@ -319,7 +319,7 @@ export default function Home() {
 
                         <div className="flex items-center justify-between gap-4 pt-2">
                             <Label htmlFor={`frequency-${chore.id}`} className="text-xs font-medium text-muted-foreground">
-                                Frequency (per 4 weeks)
+                                Frequency (per week)
                             </Label>
                             <div className="flex items-center gap-2">
                                 <Button size="icon" variant="outline" onClick={() => handleFrequencyChange(chore.id, -1)}>
@@ -345,5 +345,3 @@ export default function Home() {
     </div>
   );
 }
-
-    
