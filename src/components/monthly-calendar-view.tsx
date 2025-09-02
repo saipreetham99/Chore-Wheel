@@ -5,70 +5,66 @@ import { useMemo } from "react";
 import type { Task, Chore, TeamMemberName } from "@/lib/types";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Icon } from "./icon";
+import { shuffle } from "@/lib/utils";
 
 type MonthlyCalendarViewProps = {
-  startWeekTasks: Task[];
   chores: Record<string, Chore>;
   teamMembers: TeamMemberName[];
-  uniqueChoreIds: string[];
   monthOffset: number;
 };
 
 const WEEKS_IN_MONTH = 4;
 
 export function MonthlyCalendarView({
-  startWeekTasks,
   chores,
   teamMembers,
-  uniqueChoreIds,
   monthOffset,
 }: MonthlyCalendarViewProps) {
 
   const monthlySchedule = useMemo(() => {
-    if (!startWeekTasks || !teamMembers.length || !uniqueChoreIds.length) return [];
+    if (!teamMembers.length || !Object.keys(chores).length) return [];
   
-    const weeks: Task[][] = [startWeekTasks];
-    let lastWeekTasks = startWeekTasks;
-  
-    for (let i = 1; i < WEEKS_IN_MONTH; i++) {
-        const lastWeekAssignments = new Map<TeamMemberName, string>();
-        lastWeekTasks.forEach(task => {
-            lastWeekAssignments.set(task.assignee, task.choreId);
-        });
-  
-        const nextWeekTasks: Task[] = [];
-        const availableChoresForWeek = [...uniqueChoreIds];
-  
-        teamMembers.forEach((member, memberIndex) => {
-            const lastChoreId = lastWeekAssignments.get(member);
-            let nextChoreId: string | undefined;
-  
-            if(lastChoreId) {
-                const lastChoreIndex = availableChoresForWeek.indexOf(lastChoreId);
-                if(lastChoreIndex !== -1) {
-                    // Simple rotation: take the next chore in the list
-                    nextChoreId = availableChoresForWeek[(lastChoreIndex + 1) % availableChoresForWeek.length];
-                }
-            }
-            
-            // Fallback or initial assignment logic
-            if(!nextChoreId) {
-                nextChoreId = uniqueChoreIds[(memberIndex + i) % uniqueChoreIds.length];
-            }
-            
-            const task: Task = {
-                id: `task-${member}-${nextChoreId}-m${monthOffset}-w${i}`,
-                choreId: nextChoreId,
-                assignee: member,
-            };
-            nextWeekTasks.push(task);
-        });
-        
-        weeks.push(nextWeekTasks);
-        lastWeekTasks = nextWeekTasks;
+    // 1. Create a pool of all task instances for the month based on frequency
+    const taskPool: string[] = [];
+    for (const choreId in chores) {
+      const chore = chores[choreId];
+      for (let i = 0; i < (chore.frequency || 1); i++) {
+        taskPool.push(chore.id);
+      }
     }
+    
+    // 2. Shuffle the pool to randomize initial distribution
+    const shuffledTaskPool = shuffle(taskPool);
+
+    // 3. Distribute tasks as evenly as possible among team members
+    const assignments: Record<TeamMemberName, string[]> = {};
+    teamMembers.forEach(member => {
+      assignments[member] = [];
+    });
+
+    shuffledTaskPool.forEach((choreId, index) => {
+      const member = teamMembers[index % teamMembers.length];
+      assignments[member].push(choreId);
+    });
+    
+    // 4. Structure the assignments into weekly tasks
+    const weeks: Task[][] = Array.from({ length: WEEKS_IN_MONTH }, () => []);
+
+    for (let weekIndex = 0; weekIndex < WEEKS_IN_MONTH; weekIndex++) {
+      teamMembers.forEach(member => {
+        const choreIdForWeek = assignments[member][weekIndex];
+        if (choreIdForWeek) {
+          weeks[weekIndex].push({
+            id: `task-${member}-${choreIdForWeek}-m${monthOffset}-w${weekIndex}`,
+            choreId: choreIdForWeek,
+            assignee: member,
+          });
+        }
+      });
+    }
+
     return weeks;
-  }, [startWeekTasks, teamMembers, uniqueChoreIds, monthOffset]);
+  }, [chores, teamMembers, monthOffset]);
 
   const tasksByAssignee = (taskList: Task[]) => taskList.reduce((acc, task) => {
     acc[task.assignee] = task;

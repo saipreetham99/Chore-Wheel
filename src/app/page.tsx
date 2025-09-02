@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { TeamMemberName, Chore, Task } from '@/lib/types';
 import { useToast } from "@/hooks/use-toast";
 import { shuffle } from '@/lib/utils';
+import { Label } from '@/components/ui/label';
 
 export default function Home() {
   const [teamMembers, setTeamMembers] = useState<TeamMemberName[]>([]);
@@ -18,8 +19,8 @@ export default function Home() {
   const [isMounted, setIsMounted] = useState(false);
   const [editingMember, setEditingMember] = useState<TeamMemberName | null>(null);
   const [editingChore, setEditingChore] = useState<string | null>(null);
-  const [currentDate, setCurrentDate] = useState(new Date());
-
+  const [currentDate, setCurrentDate] = useState(() => new Date());
+  
   const { toast } = useToast();
 
   useEffect(() => {
@@ -51,29 +52,45 @@ export default function Home() {
 
   const uniqueChoreIds = useMemo(() => Object.keys(chores), [chores]);
   
-  const initialTasks: Task[] = useMemo(() => {
-    if (!teamMembers.length || !uniqueChoreIds.length) return [];
-    
-    return teamMembers.map((member, index) => {
-      const choreId = uniqueChoreIds[index % uniqueChoreIds.length];
-      return {
-          id: `task-${member}-${choreId}`,
-          choreId: choreId,
-          assignee: member as TeamMemberName,
-      };
-    }).filter((_, index) => index < teamMembers.length);
-  }, [teamMembers, uniqueChoreIds]);
-
-  const [history, setHistory] = useState<Task[][]>([initialTasks]);
+  const [history, setHistory] = useState<Record<number, Task[]>>({});
   const [monthOffset, setMonthOffset] = useState(0);
 
+  const initialTasks: Task[] = useMemo(() => {
+    if (!teamMembers.length || !uniqueChoreIds.length) return [];
+  
+    const shuffledChores = shuffle([...uniqueChoreIds]);
+  
+    return teamMembers.map((member, index) => {
+      const choreId = shuffledChores[index % shuffledChores.length];
+      return {
+        id: `task-${member}-${choreId}-m0`,
+        choreId: choreId,
+        assignee: member as TeamMemberName,
+      };
+    });
+  }, [teamMembers, uniqueChoreIds]);
+  
   useEffect(() => {
-    // Reset history when team members or chores change
-    setHistory([initialTasks]);
-    setMonthOffset(0);
-    setCurrentDate(new Date());
-  }, [initialTasks]);
-
+    if (initialTasks.length > 0 && isMounted) {
+      // Initialize history for the current month if it doesn't exist
+      if (!history[0]) {
+        try {
+          const storedHistory = localStorage.getItem('choreHistory');
+          const parsedHistory = storedHistory ? JSON.parse(storedHistory) : { 0: initialTasks };
+          setHistory(parsedHistory);
+        } catch (error) {
+          console.error("Failed to parse history from localStorage", error);
+          setHistory({ 0: initialTasks });
+        }
+      }
+    }
+  }, [initialTasks, isMounted]);
+  
+  useEffect(() => {
+    if (isMounted) {
+      localStorage.setItem('choreHistory', JSON.stringify(history));
+    }
+  }, [history, isMounted]);
 
   const handleNextMonth = () => {
     const nextMonthIndex = monthOffset + 1;
@@ -82,49 +99,27 @@ export default function Home() {
         const nextMonthStartTasks: Task[] = teamMembers.map((member, index) => {
             const choreId = shuffledChoreIds[index % shuffledChoreIds.length];
             return {
-                id: `task-${member}-${choreId}-${nextMonthIndex}`,
+                id: `task-${member}-${choreId}-m${nextMonthIndex}`,
                 choreId: choreId,
                 assignee: member,
             };
         });
-        setHistory(prev => [...prev, nextMonthStartTasks]);
+        setHistory(prev => ({ ...prev, [nextMonthIndex]: nextMonthStartTasks }));
     }
     setMonthOffset(nextMonthIndex);
-    setCurrentDate(prevDate => {
-        const newDate = new Date(prevDate);
-        newDate.setMonth(newDate.getMonth() + 1);
-        return newDate;
-    });
-    
-    toast({
-      title: "Showing Next Month",
-      description: "Task schedule advanced.",
-    });
   };
 
   const handlePreviousMonth = () => {
-    if (monthOffset === 0) {
-        toast({
-            title: "Cannot Go Back",
-            description: "You are at the current month.",
-            variant: "destructive"
-        });
-        return;
+    if (monthOffset > 0) {
+      setMonthOffset(prev => prev - 1);
     }
-
-    setMonthOffset(prev => prev - 1);
-    setCurrentDate(prevDate => {
-        const newDate = new Date(prevDate);
-        newDate.setMonth(newDate.getMonth() - 1);
-        return newDate;
-    });
-     toast({
-      title: "Showing Previous Month",
-      description: "Task schedule reverted by one month.",
-    });
   };
-
-  const dateString = currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  
+  const displayDate = useMemo(() => {
+    const d = new Date(currentDate);
+    d.setMonth(d.getMonth() + monthOffset);
+    return d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  }, [monthOffset, currentDate]);
   
   const handleAddMember = () => {
     const newMemberName = `Person ${teamMembers.length + 1}` as TeamMemberName;
@@ -143,6 +138,18 @@ export default function Home() {
     }
     const newTeamMembers = teamMembers.map(m => m === oldName ? newName.trim() as TeamMemberName : m);
     setTeamMembers(newTeamMembers);
+
+    const updateHistory = (prevHistory: Record<number, Task[]>) => {
+      const newHistory: Record<number, Task[]> = {};
+      for (const month in prevHistory) {
+        newHistory[month] = prevHistory[month].map(task => 
+          task.assignee === oldName ? { ...task, assignee: newName.trim() as TeamMemberName } : task
+        );
+      }
+      return newHistory;
+    };
+    setHistory(updateHistory);
+
     setEditingMember(null);
   };
   
@@ -153,6 +160,7 @@ export default function Home() {
       title: 'New Task',
       description: 'Task description',
       iconName: 'ClipboardList',
+      frequency: 1,
     };
     setChores({ ...chores, [newChoreId]: newChore });
   };
@@ -163,7 +171,7 @@ export default function Home() {
     setChores(newChores);
   };
 
-  const handleUpdateChore = (choreId: string, field: keyof Chore, value: string) => {
+  const handleUpdateChore = (choreId: string, field: keyof Chore, value: string | number) => {
      setChores(prev => ({
       ...prev,
       [choreId]: { ...prev[choreId], [field]: value }
@@ -188,12 +196,12 @@ export default function Home() {
                   Chore Wheel
                 </h1>
                 <p className="text-muted-foreground text-sm md:text-base">
-                  Monthly Tasks for {dateString}
+                  Monthly Tasks for {displayDate}
                 </p>
               </div>
             </div>
              <div className="flex gap-2">
-              <Button onClick={handlePreviousMonth} disabled={monthOffset === 0} variant="outline">
+              <Button onClick={handlePreviousMonth} disabled={monthOffset === 0}>
                 <ArrowLeft className="mr-2 h-4 w-4" /> Previous Month
               </Button>
               <Button onClick={handleNextMonth}>
@@ -208,10 +216,8 @@ export default function Home() {
           <div className="lg:col-span-2">
             <MonthlyCalendarView
               key={`${teamMembers.length}-${Object.keys(chores).length}-${monthOffset}`}
-              startWeekTasks={history[monthOffset] || initialTasks}
               chores={chores}
               teamMembers={teamMembers}
-              uniqueChoreIds={uniqueChoreIds}
               monthOffset={monthOffset}
             />
           </div>
@@ -258,9 +264,9 @@ export default function Home() {
               <CardContent>
                 <div className="space-y-4">
                   {Object.values(chores).map((chore) => (
-                    <div key={chore.id} className="flex flex-col gap-2 p-2 border rounded-lg">
+                    <div key={chore.id} className="flex flex-col gap-2 p-3 border rounded-lg">
                        {editingChore === chore.id ? (
-                        <div className="space-y-2">
+                        <div className="space-y-3">
                             <Input
                                 defaultValue={chore.title}
                                 placeholder="Task Title"
@@ -277,10 +283,22 @@ export default function Home() {
                                 placeholder="Lucide Icon Name"
                                 onBlur={(e) => handleUpdateChore(chore.id, 'iconName', e.target.value)}
                             />
+                            <div>
+                                <Label htmlFor={`frequency-${chore.id}`} className="text-sm font-medium">Frequency (per 4 weeks)</Label>
+                                <Input
+                                    id={`frequency-${chore.id}`}
+                                    type="number"
+                                    min="1"
+                                    defaultValue={chore.frequency}
+                                    placeholder="Times per month"
+                                    onBlur={(e) => handleUpdateChore(chore.id, 'frequency', parseInt(e.target.value, 10) || 1)}
+                                    className="mt-1"
+                                />
+                            </div>
                         </div>
                        ) : (
                         <div>
-                            <p className="font-semibold">{chore.title}</p>
+                            <p className="font-semibold">{chore.title} (x{chore.frequency})</p>
                             <p className="text-sm text-muted-foreground">{chore.description}</p>
                         </div>
                        )}
