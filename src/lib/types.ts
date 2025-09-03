@@ -2,7 +2,7 @@
 import type { LucideIcon, LucideProps } from 'lucide-react';
 import * as icons from "lucide-react";
 
-export const teamMemberNames = ["Preetham", "Sunil", "Akanksha", "Tharuni"] as const;
+export const teamMemberNames = ["Person 1", "Person 2", "Person 3", "Person 4"] as const;
 export type TeamMemberName = (typeof teamMemberNames)[number] | string;
 
 export type Chore = {
