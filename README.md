@@ -2,7 +2,7 @@
 
 A simple, customizable chore wheel and task scheduler built with Next.js and ShadCN UI. This application provides a clean, user-friendly interface to manage and assign recurring tasks for your team, household, or any group. It's designed to be flexible, allowing for an unequal number of people and tasks, and ensures fair distribution over time.
 
-![Chore Wheel Screenshot](https://storage.googleapis.com/stedi-assets/misc/chore-wheel-screenshot.png)
+![Chore Wheel Screenshot](https://github.com/saipreetham99/Chore-Wheel/blob/main/ui.jpeg)
 
 ## Features
 
