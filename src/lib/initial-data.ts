@@ -1,7 +1,7 @@
 
 import type { Chore, Task, TeamMemberName, PastAssignments } from './types';
 
-export const teamMembers: TeamMemberName[] = ['Person 1', 'Person 2', 'Person 3', 'Person 4'];
+export const teamMembers: TeamMemberName[] = ['Alex', 'Ben', 'Chris', 'Dana'];
 
 export const chores: Record<string, Chore> = {
   'clean-kitchen': { id: 'clean-kitchen', title: 'Clean Kitchen', description: 'Wipe counters, do dishes, clean sink.', iconName: 'CookingPot', frequency: 1 },
@@ -23,8 +23,8 @@ export const initialTasks: Task[] = teamMembers.map((member, index) => {
 
 
 export const initialPastAssignments: PastAssignments = {
-    'Person 1': 5,
-    'Person 2': 4,
-    'Person 3': 6,
-    'Person 4': 5,
+    'Alex': 5,
+    'Ben': 4,
+    'Chris': 6,
+    'Dana': 5,
 };
