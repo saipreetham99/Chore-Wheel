@@ -4,6 +4,7 @@ A simple, customizable chore wheel and task scheduler built with Next.js and Sha
 
 ![Chore Wheel Screenshot](https://github.com/saipreetham99/Chore-Wheel/blob/main/ui.jpeg)
 
+DEMO: 217chores.netlify.app/
 ## Features
 
 - **Customizable Lists:** Easily add, edit, or remove team members and tasks.
