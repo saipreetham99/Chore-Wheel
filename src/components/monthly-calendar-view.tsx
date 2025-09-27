@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "./ui/
 import { Icon } from "./icon";
 import { shuffle } from "@/lib/utils";
 import { ScrollArea, ScrollBar } from "./ui/scroll-area";
+import { format, startOfWeek, addDays, getDate, getMonth, getYear } from 'date-fns';
 
 type MonthlyCalendarViewProps = {
   chores: Record<string, Chore>;
@@ -21,6 +22,14 @@ export function MonthlyCalendarView({
   teamMembers,
   monthOffset,
 }: MonthlyCalendarViewProps) {
+
+  const firstDayOfMonth = useMemo(() => {
+    const d = new Date();
+    d.setDate(1); // Avoid issues with months that have fewer days
+    d.setMonth(d.getMonth() + monthOffset);
+    return d;
+  }, [monthOffset]);
+
   const monthlySchedule = useMemo(() => {
     if (!teamMembers.length || !Object.keys(chores).length) return [];
 
@@ -60,12 +69,24 @@ export function MonthlyCalendarView({
     return schedule;
   }, [chores, teamMembers, monthOffset]);
 
+  const getWeekDateRange = (weekIndex: number) => {
+    const weekStart = addDays(firstDayOfMonth, weekIndex * 7);
+    const weekEnd = addDays(weekStart, 6);
+    
+    const startFormat = getMonth(weekStart) === getMonth(weekEnd) ? 'MMM d' : 'MMM d';
+    const endFormat = 'MMM d, yyyy';
+
+    return `${format(weekStart, startFormat)} - ${format(weekEnd, endFormat)}`;
+  };
+
   return (
     <div className="space-y-8">
       <div className="space-y-10">
         {monthlySchedule.map((week, weekIndex) => (
             <div key={weekIndex} className="space-y-4">
-                <h3 className="text-xl font-semibold">Week {weekIndex + 1}</h3>
+                <h3 className="text-xl font-semibold">
+                  Week {weekIndex + 1} <span className="text-base font-normal text-muted-foreground">({getWeekDateRange(weekIndex)})</span>
+                </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     {teamMembers.map((member, memberIndex) => {
                         const assignedTasks = week[memberIndex] || [];
