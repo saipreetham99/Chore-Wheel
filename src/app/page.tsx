@@ -4,6 +4,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { initialTasks as defaultInitialTasks, chores as defaultChoores, teamMembers as defaultTeamMembers } from '@/lib/initial-data';
 import { FlameKindling, Trash2, PlusCircle, Pencil, Save, ArrowRight, ArrowLeft, Minus, Plus, Printer } from 'lucide-react';
+import html2canvas from 'html2canvas';
 import { MonthlyCalendarView } from '@/components/monthly-calendar-view';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -28,7 +29,7 @@ export default function Home() {
     try {
       const storedMembers = localStorage.getItem('teamMembers');
       const storedChores = localStorage.getItem('chores');
-      
+
       setTeamMembers(storedMembers ? JSON.parse(storedMembers) : defaultTeamMembers);
       setChores(storedChores ? JSON.parse(storedChores) : defaultChoores);
     } catch (error) {
@@ -52,14 +53,14 @@ export default function Home() {
   }, [chores, isMounted]);
 
   const uniqueChoreIds = useMemo(() => Object.keys(chores), [chores]);
-  
+
   const [history, setHistory] = useState<Record<number, Task[]>>({});
 
   const initialTasks: Task[] = useMemo(() => {
     if (!teamMembers.length || !uniqueChoreIds.length) return [];
-  
+
     const shuffledChores = shuffle([...uniqueChoreIds]);
-  
+
     return teamMembers.map((member, index) => {
       const choreId = shuffledChores[index % shuffledChores.length];
       return {
@@ -69,7 +70,7 @@ export default function Home() {
       };
     });
   }, [teamMembers, uniqueChoreIds]);
-  
+
   useEffect(() => {
     if (initialTasks.length > 0 && isMounted) {
       // Initialize history for the current month if it doesn't exist
@@ -85,7 +86,7 @@ export default function Home() {
       }
     }
   }, [initialTasks, isMounted]);
-  
+
   useEffect(() => {
     if (isMounted) {
       localStorage.setItem('choreHistory', JSON.stringify(history));
@@ -99,19 +100,19 @@ export default function Home() {
   const handlePreviousMonth = () => {
     setMonthOffset(prev => Math.max(0, prev - 1));
   };
-  
+
   const displayDate = useMemo(() => {
     const d = new Date(startDate);
     d.setMonth(d.getMonth() + monthOffset);
     return d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
   }, [monthOffset, startDate]);
-  
+
   const handleAddMember = () => {
     const newMemberName = `Person ${teamMembers.length + 1}` as TeamMemberName;
     if (teamMembers.includes(newMemberName)) return;
     setTeamMembers([...teamMembers, newMemberName]);
   };
-  
+
   const handleRemoveMember = (name: TeamMemberName) => {
     setTeamMembers(teamMembers.filter(m => m !== name));
   };
@@ -127,7 +128,7 @@ export default function Home() {
     const updateHistory = (prevHistory: Record<number, Task[]>) => {
       const newHistory: Record<number, Task[]> = {};
       for (const month in prevHistory) {
-        newHistory[month] = prevHistory[month].map(task => 
+        newHistory[month] = prevHistory[month].map(task =>
           task.assignee === oldName ? { ...task, assignee: newName.trim() as TeamMemberName } : task
         );
       }
@@ -137,7 +138,7 @@ export default function Home() {
 
     setEditingMember(null);
   };
-  
+
   const handleAddChore = () => {
     const newChoreId = `new-chore-${Object.keys(chores).length + 1}`;
     const newChore: Chore = {
@@ -149,7 +150,7 @@ export default function Home() {
     };
     setChores({ ...chores, [newChoreId]: newChore });
   };
-  
+
   const handleRemoveChore = (choreId: string) => {
     const newChores = { ...chores };
     delete newChores[choreId];
@@ -157,12 +158,12 @@ export default function Home() {
   };
 
   const handleUpdateChore = (choreId: string, field: keyof Chore, value: string | number) => {
-     let updatedValue = value;
-      if (field === 'frequency') {
-        const numValue = Number(value);
-        updatedValue = isNaN(numValue) || numValue < 1 ? 1 : numValue;
-      }
-     setChores(prev => ({
+    let updatedValue = value;
+    if (field === 'frequency') {
+      const numValue = Number(value);
+      updatedValue = isNaN(numValue) || numValue < 1 ? 1 : numValue;
+    }
+    setChores(prev => ({
       ...prev,
       [choreId]: { ...prev[choreId], [field]: updatedValue }
     }));
@@ -170,13 +171,17 @@ export default function Home() {
 
   const handleFrequencyChange = (choreId: string, amount: number) => {
     setChores(prev => {
-        const currentFrequency = prev[choreId].frequency || 1;
-        const newFrequency = Math.max(1, currentFrequency + amount);
-        return {
-            ...prev,
-            [choreId]: { ...prev[choreId], frequency: newFrequency }
-        };
+      const currentFrequency = prev[choreId].frequency || 1;
+      const newFrequency = Math.max(1, currentFrequency + amount);
+      return {
+        ...prev,
+        [choreId]: { ...prev[choreId], frequency: newFrequency }
+      };
     });
+  };
+
+  const handlePrint = () => {
+    window.print();
   };
 
   if (!isMounted) {
@@ -201,7 +206,7 @@ export default function Home() {
                 </p>
               </div>
             </div>
-             <div className="flex gap-2">
+            <div className="flex gap-2">
               <Button onClick={handlePreviousMonth} disabled={monthOffset === 0}>
                 <ArrowLeft className="mr-2 h-4 w-4" /> Previous Month
               </Button>
@@ -214,7 +219,7 @@ export default function Home() {
       </header>
       <main className="flex-1 p-4 sm:p-6">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8 printable-area">
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2" id="calendar-capture-area">
             <MonthlyCalendarView
               key={`${teamMembers.length}-${Object.keys(chores).length}-${monthOffset}`}
               chores={chores}
@@ -266,66 +271,66 @@ export default function Home() {
                 <div className="space-y-4">
                   {Object.values(chores).map((chore) => (
                     <div key={chore.id} className="flex flex-col gap-2 p-3 border rounded-lg">
-                       {editingChore === chore.id ? (
+                      {editingChore === chore.id ? (
                         <div className="space-y-3">
-                            <div className="flex justify-between items-start">
-                                <Input
-                                    defaultValue={chore.title}
-                                    placeholder="Task Title"
-                                    onBlur={(e) => handleUpdateChore(chore.id, 'title', e.target.value)}
-                                    className="text-lg font-semibold flex-grow"
-                                />
-                                <div className="flex items-center gap-2 ml-2">
-                                    <Button variant="ghost" size="icon" onClick={() => setEditingChore(null)}>
-                                        <Save className="h-4 w-4" />
-                                    </Button>
-                                    <Button variant="ghost" size="icon" onClick={() => handleRemoveChore(chore.id)}>
-                                        <Trash2 className="h-4 w-4 text-destructive" />
-                                    </Button>
-                                </div>
+                          <div className="flex justify-between items-start">
+                            <Input
+                              defaultValue={chore.title}
+                              placeholder="Task Title"
+                              onBlur={(e) => handleUpdateChore(chore.id, 'title', e.target.value)}
+                              className="text-lg font-semibold flex-grow"
+                            />
+                            <div className="flex items-center gap-2 ml-2">
+                              <Button variant="ghost" size="icon" onClick={() => setEditingChore(null)}>
+                                <Save className="h-4 w-4" />
+                              </Button>
+                              <Button variant="ghost" size="icon" onClick={() => handleRemoveChore(chore.id)}>
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                              </Button>
                             </div>
-                             <Input
-                                defaultValue={chore.description}
-                                placeholder="Task Description"
-                                onBlur={(e) => handleUpdateChore(chore.id, 'description', e.target.value)}
-                            />
-                             <Input
-                                defaultValue={chore.iconName}
-                                placeholder="Lucide Icon Name"
-                                onBlur={(e) => handleUpdateChore(chore.id, 'iconName', e.target.value)}
-                            />
+                          </div>
+                          <Input
+                            defaultValue={chore.description}
+                            placeholder="Task Description"
+                            onBlur={(e) => handleUpdateChore(chore.id, 'description', e.target.value)}
+                          />
+                          <Input
+                            defaultValue={chore.iconName}
+                            placeholder="Lucide Icon Name"
+                            onBlur={(e) => handleUpdateChore(chore.id, 'iconName', e.target.value)}
+                          />
                         </div>
-                       ) : (
+                      ) : (
                         <div className="flex justify-between items-start">
                           <div>
                             <p className="font-semibold">{chore.title}</p>
                             <p className="text-sm text-muted-foreground">{chore.description}</p>
                           </div>
-                           <div className="flex items-center gap-2">
-                              <Button variant="ghost" size="icon" onClick={() => setEditingChore(chore.id)}>
-                                <Pencil className="h-4 w-4" />
-                              </Button>
-                              <Button variant="ghost" size="icon" onClick={() => handleRemoveChore(chore.id)}>
-                                  <Trash2 className="h-4 w-4 text-destructive" />
-                              </Button>
-                           </div>
+                          <div className="flex items-center gap-2">
+                            <Button variant="ghost" size="icon" onClick={() => setEditingChore(chore.id)}>
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="icon" onClick={() => handleRemoveChore(chore.id)}>
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                          </div>
                         </div>
-                       )}
+                      )}
 
-                        <div className="flex items-center justify-between gap-4 pt-2">
-                            <Label htmlFor={`frequency-${chore.id}`} className="text-xs font-medium text-muted-foreground">
-                                Frequency (per week)
-                            </Label>
-                            <div className="flex items-center gap-2">
-                                <Button size="icon" variant="outline" onClick={() => handleFrequencyChange(chore.id, -1)}>
-                                    <Minus className="h-4 w-4" />
-                                </Button>
-                                <span className="font-bold text-lg w-6 text-center">{chore.frequency || 1}</span>
-                                <Button size="icon" variant="outline" onClick={() => handleFrequencyChange(chore.id, 1)}>
-                                    <Plus className="h-4 w-4" />
-                                </Button>
-                            </div>
+                      <div className="flex items-center justify-between gap-4 pt-2">
+                        <Label htmlFor={`frequency-${chore.id}`} className="text-xs font-medium text-muted-foreground">
+                          Frequency (per week)
+                        </Label>
+                        <div className="flex items-center gap-2">
+                          <Button size="icon" variant="outline" onClick={() => handleFrequencyChange(chore.id, -1)}>
+                            <Minus className="h-4 w-4" />
+                          </Button>
+                          <span className="font-bold text-lg w-6 text-center">{chore.frequency || 1}</span>
+                          <Button size="icon" variant="outline" onClick={() => handleFrequencyChange(chore.id, 1)}>
+                            <Plus className="h-4 w-4" />
+                          </Button>
                         </div>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -337,10 +342,10 @@ export default function Home() {
           </div>
         </div>
         <div className="max-w-7xl mx-auto mt-8 flex justify-end no-print">
-            <Button onClick={() => window.print()}>
-                <Printer className="mr-2 h-4 w-4" />
-                Print Schedule
-            </Button>
+          <Button onClick={handlePrint}>
+            <Printer className="mr-2 h-4 w-4" />
+            Print Schedule
+          </Button>
         </div>
       </main>
     </div>

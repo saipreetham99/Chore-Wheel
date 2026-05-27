@@ -34,6 +34,7 @@ body {
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
   }
+
   .dark {
     --background: 240 5% 10%;
     --foreground: 60 30% 96%;
@@ -66,6 +67,7 @@ body {
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -74,101 +76,244 @@ body {
 @media print {
   @page {
     size: A4 landscape;
-    margin: 0.5cm;
+    margin: 0;
   }
 
   body {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
+    background-color: #09090b !important;
+    color: #ffffff !important;
+    width: 297mm;
+    height: 210mm;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
   }
-  
-  .no-print {
+
+  .no-print,
+  header {
     display: none !important;
   }
-  
+
   main {
     padding: 0 !important;
     margin: 0 !important;
-  }
-  
-  /* Force light theme for printing */
-  .dark {
-    --background: 0 0% 100%;
-    --foreground: 240 5% 10%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 5% 10%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 5% 10%;
-    --primary: 45 100% 52%;
-    --primary-foreground: 45 95% 10%;
-    --secondary: 240 5% 95%;
-    --secondary-foreground: 240 5% 10%;
-    --muted: 240 5% 95%;
-    --muted-foreground: 240 5% 45%;
-    --accent: 217 91% 60%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5% 85%;
-    --input: 240 5% 85%;
-    --ring: 45 100% 52%;
-  }
-  
-  body, .card {
-    border: 1px solid #ccc !important;
-    box-shadow: none !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
   }
 
-  .printable-area h3 {
-    font-size: 0.7rem;
-    margin-bottom: 0.1rem;
-    margin-top: 0.25rem;
-  }
-  
-  .printable-area .space-y-4 {
-    gap: 0.25rem;
-  }
-
-  .printable-area .space-y-10 {
-    gap: 0.25rem;
-  }
-  
-  .printable-area .grid {
-    gap: 0.25rem;
+  :root {
+    --background: 240 5% 10%;
+    --foreground: 60 30% 96%;
+    --card: 240 5% 15%;
+    --card-foreground: 60 30% 96%;
+    --muted: 240 5% 25%;
+    --muted-foreground: 60 20% 75%;
+    --border: 240 5% 25%;
   }
 
-  .printable-area .text-sm, .printable-area .text-xs {
-    font-size: 0.55rem;
-    line-height: 1.1;
-  }
-  
-  .printable-area .p-2, .printable-area .p-3, .printable-area .p-6 {
-    padding: 0.2rem;
-  }
-  
-  .printable-area .font-semibold {
-    font-size: 0.6rem;
+  .bg-card,
+  .card {
+    background-color: #18181b !important;
+    border-color: #27272a !important;
+    color: #ffffff !important;
   }
 
-  .printable-area .lg\:grid-cols-4 {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-  
-  .printable-area .h-\[120px\] {
-    height: 75px;
-  }
-  
-  .printable-area .space-y-2 {
-    gap: 0.1rem;
+  .text-muted-foreground {
+    color: #a1a1aa !important;
   }
 
-  .printable-area .p-2.space-y-2 {
-    padding: 0.1rem;
-    gap: 0.1rem;
+  .printable-area {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    height: 100% !important;
+    padding: 3mm !important;
   }
 
-  .printable-area .flex-shrink-0 {
-    width: 1rem;
-    height: 1rem;
+  #calendar-capture-area {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+  }
+
+  #calendar-capture-area>div {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+    margin: 0 !important;
+    space-y: 0 !important;
+    justify-content: space-between !important;
+  }
+
+  #calendar-capture-area>div>div {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    /* Distribute weeks */
+    height: 100% !important;
+    gap: 1mm !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+  }
+
+  /* Single Week Row */
+  #calendar-capture-area>div>div>div {
+    flex: 1 !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    margin: 0 !important;
+    padding-bottom: 0.5mm !important;
+  }
+
+  .printable-area>div:not(#calendar-capture-area) {
+    display: none !important;
+  }
+
+  .lg\:col-span-2 {
+    grid-column: span 3 !important;
+    width: 100% !important;
+  }
+
+  /* Grid */
+  .grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 2mm !important;
+    flex: 1 !important;
+    height: auto !important;
+    align-content: stretch !important;
+  }
+
+  /* Vertical Card Layout */
+  .card {
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    border: 1px solid #27272a !important;
+    justify-content: flex-start !important;
+  }
+
+  .card-header {
+    width: 100% !important;
+    height: auto !important;
+    padding: 1.5mm !important;
+    /* Slightly more padding */
+    margin-bottom: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background-color: #27272a !important;
+    border-bottom: 1px solid #27272a !important;
+    min-height: 24px !important;
+  }
+
+  .card-title {
+    font-size: 0.8rem !important;
+    /* Bump font size */
+    font-weight: bold !important;
+    text-align: center !important;
+    line-height: 1 !important;
+  }
+
+  .card-content {
+    width: 100% !important;
+    padding: 1mm !important;
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    /* CENTER VERTICALLY */
+    overflow: hidden !important;
+  }
+
+  .scroll-area {
+    width: 100% !important;
+    height: auto !important;
+    margin: 0 !important;
+    min-height: 0 !important;
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    /* Ensure scroll area centers content */
+  }
+
+  .scroll-area-viewport {
+    height: auto !important;
+  }
+
+  /* HIDE DESCRIPTION to save vertical space! */
+  .text-xs.text-muted-foreground {
+    display: none !important;
+  }
+
+  /* Task Item */
+  .p-2 {
+    padding: 0.5mm !important;
+  }
+
+  .space-y-2 {
+    gap: 0.5mm !important;
+  }
+
+  .p-2.rounded-lg.bg-muted\/50 {
+    padding: 1.5mm !important;
+    /* Comfortable padding */
+    min-height: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    background-color: #18181b !important;
+    justify-content: center !important;
+    /* Center text if icon allows */
+  }
+
+  /* Icon */
+  .h-5.w-5 {
+    width: 0.8rem !important;
+    /* Bump size */
+    height: 0.8rem !important;
+    margin-right: 1.5mm !important;
+  }
+
+  /* Task Title */
+  .font-semibold {
+    font-size: 0.75rem !important;
+    /* Bump size */
+    line-height: 1.2 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /* Week Header */
+  h3 {
+    font-size: 0.9rem !important;
+    /* Bump size */
+    font-weight: bold !important;
+    margin-bottom: 1mm !important;
+    margin-top: 0 !important;
+    line-height: 1 !important;
+    text-transform: uppercase;
+  }
+
+  * {
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+  }
+
+  *::-webkit-scrollbar {
+    display: none !important;
   }
 }
