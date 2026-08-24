@@ -2,64 +2,72 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: Arial, Helvetica, sans-serif;
-}
-
 @layer base {
   :root {
-    --background: 60 56% 91%;
-    --foreground: 240 5% 20%;
-    --card: 60 30% 96%;
-    --card-foreground: 240 5% 20%;
-    --popover: 60 30% 96%;
-    --popover-foreground: 240 5% 20%;
-    --primary: 45 100% 52%;
-    --primary-foreground: 45 95% 10%;
-    --secondary: 50 20% 85%;
-    --secondary-foreground: 50 20% 25%;
-    --muted: 50 20% 85%;
-    --muted-foreground: 50 15% 45%;
-    --accent: 217 91% 55%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 60 20% 80%;
-    --input: 60 20% 83%;
-    --ring: 45 100% 52%;
-    --chart-1: 45 100% 52%;
-    --chart-2: 217 91% 55%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
+    /* Canvas: cool paper white, not cream */
+    --background: 220 20% 98%;
+    --foreground: 224 24% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 224 24% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 24% 12%;
+
+    /* Brand amber, deepened so it holds up on white */
+    --primary: 38 92% 46%;
+    --primary-foreground: 40 100% 98%;
+
+    --secondary: 220 16% 95%;
+    --secondary-foreground: 224 20% 26%;
+    --muted: 220 16% 95%;
+    --muted-foreground: 220 10% 46%;
+    --accent: 220 16% 94%;
+    --accent-foreground: 224 24% 16%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 16% 90%;
+    --input: 220 16% 88%;
+    --ring: 38 92% 46%;
+
+    --radius: 0.75rem;
+
+    /* Per-person identity hues. Readable as solid text AND as a 10% tint. */
+    --member-1: 243 62% 59%;
+    --member-2: 174 84% 30%;
+    --member-3: 333 71% 51%;
+    --member-4: 25 92% 45%;
+    --member-5: 262 83% 58%;
+    --member-6: 199 89% 38%;
+
+    --chart-1: 243 62% 59%;
+    --chart-2: 174 84% 30%;
+    --chart-3: 333 71% 51%;
+    --chart-4: 25 92% 45%;
+    --chart-5: 262 83% 58%;
   }
 
   .dark {
-    --background: 240 5% 10%;
-    --foreground: 60 30% 96%;
-    --card: 240 5% 15%;
-    --card-foreground: 60 30% 96%;
-    --popover: 240 5% 15%;
-    --popover-foreground: 60 30% 96%;
-    --primary: 45 100% 52%;
-    --primary-foreground: 45 95% 10%;
-    --secondary: 240 5% 25%;
-    --secondary-foreground: 60 30% 96%;
-    --muted: 240 5% 25%;
-    --muted-foreground: 60 20% 75%;
-    --accent: 217 91% 60%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5% 25%;
-    --input: 240 5% 25%;
-    --ring: 45 100% 52%;
-    --chart-1: 45 100% 52%;
-    --chart-2: 217 91% 60%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    --background: 224 24% 9%;
+    --foreground: 220 20% 96%;
+    --card: 224 22% 12%;
+    --card-foreground: 220 20% 96%;
+    --popover: 224 22% 12%;
+    --popover-foreground: 220 20% 96%;
+    --primary: 38 92% 52%;
+    --primary-foreground: 38 95% 10%;
+    --secondary: 224 18% 18%;
+    --secondary-foreground: 220 20% 96%;
+    --muted: 224 18% 18%;
+    --muted-foreground: 220 12% 66%;
+    --accent: 224 18% 20%;
+    --accent-foreground: 220 20% 96%;
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 224 18% 20%;
+    --input: 224 18% 22%;
+    --ring: 38 92% 52%;
   }
 }
 
@@ -69,251 +77,258 @@ body {
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "cv01", "cv03", "ss01";
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
   }
 }
 
+@layer components {
+  .surface-shadow {
+    box-shadow:
+      0 1px 2px rgba(16, 24, 40, 0.04),
+      0 8px 24px -16px rgba(16, 24, 40, 0.24);
+  }
+
+  /* Column count follows the number of people, so nobody wraps to row two. */
+  .member-grid {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+
+  @media (min-width: 640px) {
+    .member-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .member-grid {
+      grid-template-columns: repeat(var(--cols, 4), minmax(0, 1fr));
+    }
+  }
+
+  /* The print sheet exists in the DOM but never shows on screen. */
+  .print-sheet {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   PRINT — one A4 landscape page, always.
+   The app shell is hidden outright and .print-sheet takes over. Person identity
+   is carried by BORDER and TEXT colour, never by background alone, because
+   Chrome drops backgrounds when "Background graphics" is unchecked.
+   --------------------------------------------------------------------------- */
 @media print {
   @page {
     size: A4 landscape;
-    margin: 0;
+    margin: 8mm;
   }
 
+  html,
   body {
+    background: #ffffff !important;
+    color: #101828 !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
-    background-color: #09090b !important;
-    color: #ffffff !important;
-    width: 297mm;
-    height: 210mm;
+  }
+
+  .app-shell {
+    display: none !important;
+  }
+
+  .print-sheet {
+    display: flex !important;
+    flex-direction: column;
+    width: 100%;
+    height: 194mm; /* 210mm page − 2 × 8mm margin */
     overflow: hidden;
+    break-inside: avoid;
+    font-family: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+    color: #101828;
+  }
+
+  .print-head {
     display: flex;
-    justify-content: center;
-    align-items: flex-start;
+    align-items: baseline;
+    justify-content: space-between;
+    flex: none;
+    border-bottom: 1.2pt solid #101828;
+    padding-bottom: 2mm;
+    margin-bottom: 3mm;
   }
 
-  .no-print,
-  header {
-    display: none !important;
+  .print-title {
+    font-family: "Bricolage Grotesque", "Instrument Sans", sans-serif;
+    font-size: 15pt;
+    font-weight: 700;
+    letter-spacing: -0.015em;
   }
 
-  main {
-    padding: 0 !important;
-    margin: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    max-width: none !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: flex-start !important;
+  .print-month {
+    font-size: 10pt;
+    font-weight: 600;
+    color: #475467;
   }
 
-  :root {
-    --background: 240 5% 10%;
-    --foreground: 60 30% 96%;
-    --card: 240 5% 15%;
-    --card-foreground: 60 30% 96%;
-    --muted: 240 5% 25%;
-    --muted-foreground: 60 20% 75%;
-    --border: 240 5% 25%;
+  .print-grid {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2mm;
+    min-height: 0;
   }
 
-  .bg-card,
-  .card {
-    background-color: #18181b !important;
-    border-color: #27272a !important;
-    color: #ffffff !important;
+  .print-row {
+    display: grid;
+    grid-template-columns: 22mm repeat(var(--people), minmax(0, 1fr));
+    column-gap: 2.5mm;
+    align-items: stretch;
+    break-inside: avoid;
   }
 
-  .text-muted-foreground {
-    color: #a1a1aa !important;
+  .print-row--head {
+    flex: none;
+    margin-bottom: 1mm;
   }
 
-  .printable-area {
-    display: flex !important;
-    flex-direction: column !important;
-    width: 100% !important;
-    height: 100% !important;
-    padding: 3mm !important;
+  /* Week rows share whatever height is left, evenly. */
+  .print-grid > .print-row:not(.print-row--head) {
+    flex: 1 1 0;
+    min-height: 0;
+    border-top: 0.5pt solid #EAECF0;
+    padding-top: 1.5mm;
   }
 
-  #calendar-capture-area {
-    flex: 1 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    height: 100% !important;
+  .print-person {
+    display: flex;
+    align-items: center;
+    gap: 1.5mm;
+    min-width: 0;
+    padding-bottom: 1.2mm;
+    border-bottom: 2pt solid hsl(var(--rail));
   }
 
-  #calendar-capture-area>div {
-    flex: 1 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    height: 100% !important;
-    margin: 0 !important;
-    space-y: 0 !important;
-    justify-content: space-between !important;
+  .print-monogram {
+    flex: none;
+    font-size: 6.5pt;
+    font-weight: 700;
+    line-height: 1;
+    color: hsl(var(--rail));
+    border: 0.8pt solid hsl(var(--rail));
+    border-radius: 1mm;
+    padding: 0.9mm 1.1mm;
   }
 
-  #calendar-capture-area>div>div {
-    flex: 1 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: space-between !important;
-    /* Distribute weeks */
-    height: 100% !important;
-    gap: 1mm !important;
-    margin: 0 !important;
-    overflow: hidden !important;
+  .print-person-name {
+    font-size: 9.5pt;
+    font-weight: 700;
+    color: hsl(var(--rail));
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
-  /* Single Week Row */
-  #calendar-capture-area>div>div>div {
-    flex: 1 !important;
-    min-height: 0 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    margin: 0 !important;
-    padding-bottom: 0.5mm !important;
+  .print-week {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-right: 2.5mm;
+    border-right: 0.5pt solid #EAECF0;
+    min-width: 0;
   }
 
-  .printable-area>div:not(#calendar-capture-area) {
-    display: none !important;
-  }
-
-  .lg\:col-span-2 {
-    grid-column: span 3 !important;
-    width: 100% !important;
-  }
-
-  /* Grid */
-  .grid {
-    display: grid !important;
-    grid-template-columns: repeat(4, 1fr) !important;
-    gap: 2mm !important;
-    flex: 1 !important;
-    height: auto !important;
-    align-content: stretch !important;
-  }
-
-  /* Vertical Card Layout */
-  .card {
-    height: 100% !important;
-    display: flex !important;
-    flex-direction: column !important;
-    overflow: hidden !important;
-    border: 1px solid #27272a !important;
-    justify-content: flex-start !important;
-  }
-
-  .card-header {
-    width: 100% !important;
-    height: auto !important;
-    padding: 1.5mm !important;
-    /* Slightly more padding */
-    margin-bottom: 0 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    background-color: #27272a !important;
-    border-bottom: 1px solid #27272a !important;
-    min-height: 24px !important;
-  }
-
-  .card-title {
-    font-size: 0.8rem !important;
-    /* Bump font size */
-    font-weight: bold !important;
-    text-align: center !important;
-    line-height: 1 !important;
-  }
-
-  .card-content {
-    width: 100% !important;
-    padding: 1mm !important;
-    flex: 1 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    /* CENTER VERTICALLY */
-    overflow: hidden !important;
-  }
-
-  .scroll-area {
-    width: 100% !important;
-    height: auto !important;
-    margin: 0 !important;
-    min-height: 0 !important;
-    flex: 1 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    /* Ensure scroll area centers content */
-  }
-
-  .scroll-area-viewport {
-    height: auto !important;
-  }
-
-  /* HIDE DESCRIPTION to save vertical space! */
-  .text-xs.text-muted-foreground {
-    display: none !important;
-  }
-
-  /* Task Item */
-  .p-2 {
-    padding: 0.5mm !important;
-  }
-
-  .space-y-2 {
-    gap: 0.5mm !important;
-  }
-
-  .p-2.rounded-lg.bg-muted\/50 {
-    padding: 1.5mm !important;
-    /* Comfortable padding */
-    min-height: 0 !important;
-    display: flex !important;
-    align-items: center !important;
-    background-color: #18181b !important;
-    justify-content: center !important;
-    /* Center text if icon allows */
-  }
-
-  /* Icon */
-  .h-5.w-5 {
-    width: 0.8rem !important;
-    /* Bump size */
-    height: 0.8rem !important;
-    margin-right: 1.5mm !important;
-  }
-
-  /* Task Title */
-  .font-semibold {
-    font-size: 0.75rem !important;
-    /* Bump size */
-    line-height: 1.2 !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-  }
-
-  /* Week Header */
-  h3 {
-    font-size: 0.9rem !important;
-    /* Bump size */
-    font-weight: bold !important;
-    margin-bottom: 1mm !important;
-    margin-top: 0 !important;
-    line-height: 1 !important;
+  .print-week-no {
+    font-size: 7.5pt;
+    font-weight: 700;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
+    white-space: nowrap;
   }
 
-  * {
-    -ms-overflow-style: none !important;
-    scrollbar-width: none !important;
+  .print-week-dates {
+    font-size: 7pt;
+    color: #667085;
+    margin-top: 0.6mm;
+    white-space: nowrap;
   }
 
-  *::-webkit-scrollbar {
-    display: none !important;
+  .print-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2mm;
+    min-width: 0;
+  }
+
+  .print-chip {
+    display: flex;
+    align-items: center;
+    gap: 1.3mm;
+    min-width: 0;
+    padding: 1.1mm 1.6mm;
+    border-left: 1.8pt solid hsl(var(--rail));
+    border-radius: 0 1mm 1mm 0;
+    background: hsl(var(--rail) / 0.08);
+    font-size: 8pt;
+    font-weight: 600;
+    line-height: 1.15;
+  }
+
+  .print-chip svg {
+    flex: none;
+    width: 3.2mm;
+    height: 3.2mm;
+    color: hsl(var(--rail));
+  }
+
+  .print-chip span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .print-free {
+    padding: 1.1mm 1.6mm;
+    border-left: 1.8pt solid #E4E7EC;
+    border-radius: 0 1mm 1mm 0;
+    font-size: 7.5pt;
+    font-style: italic;
+    color: #98A2B3;
+  }
+
+  /* Busier months step the type down rather than spilling off the page. */
+  .print-sheet[data-density="medium"] .print-chip {
+    font-size: 7.5pt;
+    padding: 0.9mm 1.4mm;
+  }
+
+  .print-sheet[data-density="tight"] .print-chip {
+    font-size: 6.8pt;
+    padding: 0.7mm 1.2mm;
+    gap: 1mm;
+  }
+
+  .print-sheet[data-density="tight"] .print-chip svg {
+    width: 2.6mm;
+    height: 2.6mm;
+  }
+
+  .print-sheet[data-density="tight"] .print-cell {
+    gap: 0.9mm;
   }
 }
